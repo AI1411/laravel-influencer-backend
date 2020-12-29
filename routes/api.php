@@ -1,5 +1,3 @@
 <?php
 
-Route::get('hello', function () {
-    return 'hello';
-});
+Route::apiResource('users', 'UserController');
