@@ -6,6 +6,7 @@ use App\Http\Requests\RegisterRequest;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,13 +19,24 @@ class AuthController extends Controller
 
             $token = $user->createToken('admin')->accessToken;
 
-            return [
+            $cookie = cookie('jwt', $token, 3600);
+
+            return \response([
                 'token' => $token,
-            ];
+            ])->withCookie($cookie);
         }
         return response([
             'error' => '認証失敗'
         ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function logout()
+    {
+        $cookie = Cookie::forget('jwt');
+
+        return \response([
+            'message' => 'success',
+        ])->withCookie($cookie);
     }
 
     public function register(RegisterRequest $request)
