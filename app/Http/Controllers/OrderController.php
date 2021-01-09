@@ -17,18 +17,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-
-    /**
      * @param Order $order
      * @return OrderResource
      */
@@ -37,26 +25,32 @@ class OrderController extends Controller
         return new OrderResource($order);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Order $order)
+    public function export()
     {
-        //
-    }
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=orders.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post=check=0, pre-check=0",
+            "Expires" => "0",
+        ];
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Order $order)
-    {
-        //
+        $callback = function () {
+            $orders = Order::all();
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, ['ID', 'Name', "Email", 'Product Title', "Price", "Quantity"]);
+
+            foreach ($orders as $order) {
+                fputcsv($file, [$order->id, $order->name, $order->email, '', '', '']);
+
+                foreach ($order->orderItems as $orderItem) {
+                    fputcsv($file, ['', '', '', $orderItem->product_title, $orderItem->price, $orderItem->quantity]);
+                }
+            }
+            fclose($file);
+        };
+
+        return \Response::stream($callback, 200, $headers);
     }
 }
