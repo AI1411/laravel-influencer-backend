@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -33,12 +34,10 @@ class UserController extends Controller
     {
         Gate::authorize('edit', 'users');
 
-        $user = User::create([
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'email' => $request->input('email'),
-            'password' => \Hash::make($request->input('password')),
-        ]);
+        $user = User::create(
+            $request->only('first_name', 'last_name', 'email', 'role_id')
+            + ['password' => Hash::make($request->input('password'))]
+        );
 
         return response(new UserResource($user), Response::HTTP_CREATED);
     }
