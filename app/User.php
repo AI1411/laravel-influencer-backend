@@ -76,6 +76,6 @@ class User extends Authenticatable
 
     public function hasAccess($access)
     {
-        return $this->permissions()->contains("view_{$access}");
+        return $this->permissions()->contains($access);
     }
 }
