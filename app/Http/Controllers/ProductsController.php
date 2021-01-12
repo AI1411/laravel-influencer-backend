@@ -32,7 +32,7 @@ class ProductsController extends Controller
     {
         Gate::authorize('edit', 'products');
 
-        $product = $request->only('title', 'description', 'image', 'price');
+        $product = Product::create($request->only('title', 'description', 'image', 'price'));
 
         return response(new ProductResource($product), Response::HTTP_CREATED);
     }
