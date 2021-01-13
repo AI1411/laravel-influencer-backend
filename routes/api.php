@@ -3,7 +3,10 @@
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'admin'
+], function () {
     Route::post('logout', 'AuthController@logout');
     Route::get('chart', 'DashboardController@chart');
     Route::get('user', 'UserController@user');
